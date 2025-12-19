@@ -3,8 +3,10 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -13,10 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,6 +73,21 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * 员工分页查询
+     *
+     * @param employeePageQueryDTO 前端传来的查询参数（页码、每页条数、姓名）
+     * @return 统一返回结果 Result，包含 PageResult（总记录数、当前页列表）
+     */
+    @GetMapping("/page")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        //传来参数-->调用service处理业务逻辑
+        //控制台打印参数信息
+        log.info("员工分页查询，参数为：{}", employeePageQueryDTO);
+
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
+    }
 
     /**
      * 退出
