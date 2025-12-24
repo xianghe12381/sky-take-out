@@ -7,8 +7,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
-
 @Mapper
 public interface EmployeeMapper {
 
@@ -38,4 +36,11 @@ public interface EmployeeMapper {
      * @return
      */
     public Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * @param employee
+     */
+    public void update(Employee employee);
+
+    public Employee getById(Long id);
 }

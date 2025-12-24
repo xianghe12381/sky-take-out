@@ -16,10 +16,12 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +31,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private EmployeeService employeeService;
 
     /**
      * 员工登录
@@ -105,5 +109,38 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return new PageResult(total, result);
     }
+
+
+    /**
+     * @param id
+     * @param status
+     */
+    public void startOrStop(Long id, Integer status) {
+        Employee employee = Employee.builder().status(status).id(id).updateUser(BaseContext.getCurrentId())
+                .updateTime(LocalDateTime.now()).build();
+        employeeMapper.update(employee);
+        //为什么这里能直接用Employee.builder，不是没创建对象呢？
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("******");
+        return employee;
+    }
+
+    public Employee updateEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        employeeMapper.update(employee);
+        return employee;
+    }
+
 
 }

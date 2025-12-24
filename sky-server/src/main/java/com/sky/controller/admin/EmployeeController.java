@@ -1,10 +1,12 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.mapper.EmployeeMapper;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
@@ -89,6 +91,40 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    //启用禁用账户,要增删改的，用push
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用员工账号")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("启用禁用员工账号：{},{}", status, id);
+        employeeService.startOrStop(id, status);
+        return Result.success();
+    }
+
+    /**
+     * 查询员工信息
+     *
+     * @param id 参数是员工的id
+     * @return 返回查询id的对应的员工信息
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("查询员工信息")
+    public Result<Employee> check(@PathVariable Long id) {
+        log.info("查询员工ID:{}", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("编辑员工信息")
+    public Result updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        Employee employee = employeeService.updateEmployee(employeeDTO);
+        return Result.success();
+    }
+
     /**
      * 退出
      *
@@ -98,5 +134,6 @@ public class EmployeeController {
     public Result<String> logout() {
         return Result.success();
     }
+
 
 }
