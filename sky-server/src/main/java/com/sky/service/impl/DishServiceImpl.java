@@ -1,12 +1,17 @@
 package com.sky.service.impl;
 
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +56,39 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
         /*这里的代码是操控dish_flavor表的*/
+    }
+
+    // 在 DishServiceImpl 类中添加
+    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+        // 1. 开始分页 (PageHelper 会自动拦截下一条 SQL 添加 limit)
+        PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
+
+        // 2. 调用 Mapper (这里返回的是 Page<DishVO>，PageHelper 的泛型)
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
+
+        // 3. 封装结果
+        return new PageResult(page.getTotal(), page.getResult());
+
+    }
+
+    /**
+     * 条件查询菜品和口味
+     *
+     * @param dish
+     * @return
+     */
+    public List<com.sky.vo.DishVO> listWithFlavor(Dish dish) {
+        // 1. 先查出符合条件的菜品（比如川菜下的所有菜）
+        List<com.sky.vo.DishVO> dishVOList = dishMapper.list(dish);
+
+        // 2. 遍历每一个菜品，去查它对应的口味
+        for (com.sky.vo.DishVO dishVO : dishVOList) {
+            // 根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(dishVO.getId());
+            // 把查到的口味塞进菜品对象里
+            dishVO.setFlavors(flavors);
+        }
+
+        return dishVOList;
     }
 }
