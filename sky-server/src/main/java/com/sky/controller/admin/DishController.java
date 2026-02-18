@@ -4,6 +4,7 @@ import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
+import com.sky.mapper.DishMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -102,4 +104,25 @@ public class DishController {
     }
 
 
+    @DeleteMapping
+    @ApiOperation("批量删除菜品")
+    public Result deleteBatch(@RequestParam List<Long> ids) {
+        log.info("批量删除菜品ID: {}", ids);
+        dishService.deleteBatch(ids);
+
+        cleanCache("dish_*");
+        return Result.success();
+    }
+
+    /**
+     * 统一清理缓存的私有方法 (建议提取出来)
+     *
+     * @param pattern
+     */
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        if (keys != null && keys.size() > 0) {
+            redisTemplate.delete(keys);
+        }
+    }
 }

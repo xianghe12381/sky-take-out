@@ -46,5 +46,15 @@ public interface DishMapper {
      */
     List<com.sky.vo.DishVO> list(Dish dish);
 
+    // 在 DishMapper.java 中添加
+    /**
+     * 根据主键列表批量删除菜品
+     * @param ids
+     */
+    void deleteBatch(List<Long> ids);
+
+
+    // DishMapper.java
+    List<Dish> getByIds(List<Long> ids);
 
 }

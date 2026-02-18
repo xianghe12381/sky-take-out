@@ -26,4 +26,6 @@ public interface DishService {
      * @return
      */
     List<com.sky.vo.DishVO> listWithFlavor(Dish dish);
+
+    public void deleteBatch(List<java.lang.Long> ids);
 }
